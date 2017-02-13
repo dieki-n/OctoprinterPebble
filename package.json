@@ -1,0 +1,27 @@
+{
+    "author": "Dieki",
+    "dependencies": {},
+    "keywords": [],
+    "name": "octoprint",
+    "pebble": {
+        "capabilities": [
+            "configurable"
+        ],
+        "displayName": "OctoPrint Monitor",
+        "enableMultiJS": true,
+        "messageKeys": [],
+        "projectType": "rocky",
+        "resources": {
+            "media": []
+        },
+        "sdkVersion": "3",
+        "targetPlatforms": [
+            "basalt"
+        ],
+        "uuid": "461e8f47-5cb3-4956-b882-8a5ec9a230c7",
+        "watchapp": {
+            "watchface": true
+        }
+    },
+    "version": "1.0.0"
+}
