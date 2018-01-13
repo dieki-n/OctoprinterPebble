@@ -19,6 +19,19 @@ module.exports = [
          {  
             "type":"text",
             "defaultValue":"You can find your API key in Octoprint under Settings -> API -> API Key"
+         },
+         {
+            "type":"input",
+            "appKey" : "username",
+            "label" : "HTTP Auth Username (if used)"
+         },
+         {
+            "type":"input",
+            "appKey" : "password",
+            "label" : "HTTP Auth Password (if used)",
+            "attributes" : {
+                "type" : "password"
+            }
          }
       ]
    },

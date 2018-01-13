@@ -8,6 +8,7 @@ var stored_data = {"progress"      : 0,
                    "weather_desc"  : "",
                    "weather_init"  : false,
                    "init"          : false,
+                   "is_heating"    : false,
                    "error"         : 0};
 var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 var g_timeout = 0;
@@ -60,8 +61,9 @@ rocky.on('draw', function(event) {
     ctx.textAlign = 'left';
     ctx.fillText(d.getHours() > 12 ? "PM" : "AM", w / 2 - 11 + (time_width / 2) + 3, 32, w);
     
+    ctx.textAlign = 'center';
     ctx.font = '18px bold Gothic';
-    ctx.fillText(date_weather_string, w / 2 - 11 - (time_width / 2), 55, w);
+    ctx.fillText(date_weather_string, w / 2, 55, w);  
   } else {
     ctx.fillRect(0, 140, w, 168 - 140);  
     
@@ -72,20 +74,20 @@ rocky.on('draw', function(event) {
     ctx.font = '24px bold Gothic';
     ctx.fillText(d.getHours() > 12 ? "PM" : "AM", w / 2 - 11 + (time_width / 2) + 3, 57, w);
     
+    ctx.textAlign = 'center';
     ctx.font = '18px bold Gothic';
-    ctx.fillText(date_weather_string, w / 2 - 11 - time_width / 2, 80, w);  
+    ctx.fillText(date_weather_string, w / 2, 80, w);  
   }
   
   
-  
+  ctx.textAlign = 'left';
+  ctx.fillStyle = 'black';
   if (stored_data.init === true){
     g_timeout = 0;
     if (stored_data.printer_state == "Printing" || stored_data.printer_state == "Paused"){
       //We are printing!
       drawProgressBar(11, 104, 124, 20, stored_data.progress, ctx);
       ctx.font = '14px bold Gothic';
-      ctx.textAlign = 'left';
-      ctx.fillStyle = 'black';
       var time_left_string = Math.floor(stored_data.time_left / 3600) + "h " + Math.floor(stored_data.time_left % 3600 / 60) + "m";
       var dim = ctx.measureText(time_left_string);
       ctx.beginPath();
@@ -97,7 +99,7 @@ rocky.on('draw', function(event) {
       ctx.closePath();
       ctx.fill();
       
-      
+      ctx.textAlign = 'left';
       ctx.fillStyle = 'white';
       ctx.fillText(time_left_string, 15, 122, w);
       ctx.fillStyle = 'black';
@@ -105,43 +107,39 @@ rocky.on('draw', function(event) {
       ctx.fillText("B: " + stored_data.bed_temp, 137, 133);
       ctx.fillText("N: " + stored_data.nozzle_temp, 137, 145);
       
-      
-      
       ctx.font = '18px bold Gothic';
       ctx.textAlign = 'left';
       ctx.fillStyle = 'black';
-      ctx.fillText(stored_data.printer_state.toUpperCase(), 10, 140);
+      ctx.fillText(stored_data.is_heating ? "HEATING" : stored_data.printer_state.toUpperCase(), 10, 140);
     } else if (stored_data.printer_state == "Offline") {
+      
       //Printer is disconnected entirely
       ctx.font = '18px bold Gothic';
-      ctx.textAlign = 'left';
-      ctx.fillStyle = 'black';
       ctx.fillText("PRINTER OFF", 10, 140);
       ctx.font = '14px bold Gothic';
       ctx.textAlign = 'right';
     } else {
+      
       //Printer is in standby
       ctx.font = '18px bold Gothic';
       ctx.textAlign = 'left';
       ctx.fillStyle = 'black';
-      ctx.fillText("STANDBY", 10, 140);
+      ctx.fillText(stored_data.is_heating ? "HEATING" : "STANDBY", 10, 140);
       ctx.font = '14px bold Gothic';
       ctx.textAlign = 'right';
       ctx.fillText("B: " + stored_data.bed_temp, 137, 138);
       ctx.fillText("N: " + stored_data.nozzle_temp, 137, 150);
     }
   } else if (stored_data.error == 1) {
+    
     //Bad API key
     ctx.font = '18px bold Gothic';
-    ctx.textAlign = 'left';
-    ctx.fillStyle = 'black';
     ctx.fillText("API KEY ERROR", 10, 140);
   } else {
+    
     //No connection yet.
     ctx.font = '18px bold Gothic';
-    ctx.textAlign = 'left';
-    ctx.fillStyle = 'black';
-    if (g_timeout < 2){
+    if (g_timeout < 3){
       ctx.fillText("CONNECTING...", 10, 140);
     } else{
       ctx.fillText("CONNECTION FAIL", 10, 140);
@@ -197,6 +195,7 @@ rocky.on('message', function(event){
   } else if (event.data.type == "printerTemp"){
     stored_data.bed_temp = event.data.bed_temp;
     stored_data.nozzle_temp = event.data.nozzle_temp;
+    stored_data.is_heating = event.data.is_heating;
     stored_data.init = true;
   } else if (event.data.type == "weather"){
     stored_data.weather_temp = event.data.temp;
